@@ -23,10 +23,10 @@ import scipy
 import gensim
 import xgboost
 
-print("✅ numpy:", numpy.__version__)
-print("✅ scipy:", scipy.__version__)
-print("✅ gensim:", gensim.__version__)
-print("✅ xgboost:", xgboost.__version__)
+print(" numpy:", numpy.__version__)
+print(" scipy:", scipy.__version__)
+print(" gensim:", gensim.__version__)
+print(" xgboost:", xgboost.__version__)
 
 import pandas as pd
 
