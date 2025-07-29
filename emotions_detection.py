@@ -514,7 +514,7 @@ from sklearn.model_selection import train_test_split
 
 X_knn, _, y_knn, _ = train_test_split(
     X_train_downsampled, y_train_downsampled,
-    train_size=0.3, stratify=y_train_downsampled, random_state=42
+    train_size=0.2, stratify=y_train_downsampled, random_state=42
 )
 
 def tune_hyperparameters(model_class, param_distributions, X, y, n_trials=20):
