@@ -39,7 +39,7 @@ print("💻 Using device:", device)
 
 os.environ["WANDB_DISABLED"] = "true"
 
-df_small = df.sample(n=2000, random_state=42).reset_index(drop=True)
+df_small = df.sample(n=3000, random_state=42).reset_index(drop=True)
 
 label_encoder = LabelEncoder()
 df_small["label_enc"] = label_encoder.fit_transform(df_small["label"])
@@ -49,8 +49,8 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
 )
 
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=128)
-test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=128)
+train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=64)
+test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=64)
 
 class EmotionDataset(Dataset):
     def __init__(self, encodings, labels):
@@ -76,7 +76,7 @@ training_args = TrainingArguments(
     output_dir="./results",
     per_device_train_batch_size=4,
     per_device_eval_batch_size=8,
-    num_train_epochs=2,
+    num_train_epochs=3,
     weight_decay=0.01,
     logging_dir="./logs",
     logging_steps=5,
