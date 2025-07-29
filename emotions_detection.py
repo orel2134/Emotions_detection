@@ -10,17 +10,14 @@ Original file is located at
 from google.colab import files
 uploaded = files.upload()
 
-# 🛠 התקנות
 !pip uninstall -y scipy gensim
 !pip install numpy==1.26.4
 !pip install scipy==1.13.1 gensim==4.3.3 xgboost optuna wordcloud textblob seaborn
 
-# 🧠 הורדת משאבים ל-NLTK
 import nltk
 nltk.download('punkt')
 nltk.download('stopwords')
 
-# ✅ אישור שהכל עלה
 import numpy
 import scipy
 import gensim
@@ -39,70 +36,68 @@ df.head()
 import gensim.downloader as api
 from gensim.models import Word2Vec
 
-# Data manipulation and analysis
-import pandas as pd  # DataFrame operations
-import numpy as np  # Numerical operations
+import pandas as pd
+import numpy as np
 
-# Data visualization
-import matplotlib.pyplot as plt  # Plotting library
-import seaborn as sns  # Statistical data visualization
-from wordcloud import WordCloud, ImageColorGenerator  # Word cloud generation
+# visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud, ImageColorGenerator
 from PIL import Image  # Image processing
 
-# Text processing
-import string  # String operations
-from nltk.tokenize import word_tokenize  # Tokenizing text
+# processing
+import string
+from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords  # Common stop words
 from nltk.stem import PorterStemmer  # Stemming words
-import nltk  # Natural language toolkit
-nltk.download('punkt')  # Download tokenizer data
-nltk.download('stopwords')  # Download stop words data
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
 
-# Text analysis
-from textblob import TextBlob  # Text processing library
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer  # Text vectorization
+# text analysis
+from textblob import TextBlob
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
-# Data balancing
-from sklearn.utils import resample  # Resampling data
 
-# Data preparation
-import optuna  # Hyperparameter tuning library
-from sklearn.model_selection import train_test_split  # Splitting data
+from sklearn.utils import resample
+
+
+import optuna
+from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV  # Hyperparameter tuning
 from sklearn.model_selection import StratifiedKFold
 
 # Word embeddings
-import gensim.downloader as api  # Download pre-trained Word2Vec models
-from gensim.models import Word2Vec  # Word2Vec model
+import gensim.downloader as api
+from gensim.models import Word2Vec
 
 # Machine learning models
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier  # Ensemble models
-from xgboost import XGBClassifier  # Extreme Gradient Boosting
-from sklearn.neighbors import KNeighborsClassifier  # K-Nearest Neighbors
-from sklearn.svm import SVC  # Support Vector Classifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from xgboost import XGBClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 
-from sklearn import metrics  # Evaluation metrics
+from sklearn import metrics
 
-from sklearn.dummy import DummyClassifier  # Dummy classifier
-from sklearn.metrics import classification_report, confusion_matrix  # Evaluation metrics
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import classification_report, confusion_matrix
 
-from tensorflow.keras.preprocessing.text import Tokenizer  # Tokenization
-from tensorflow.keras.preprocessing.sequence import pad_sequences  # Padding sequences
-from tensorflow.keras.utils import to_categorical  # One-hot encoding
-import tensorflow as tf  # Deep learning library
-from tensorflow.keras.models import Sequential  # Sequential model
-from tensorflow.keras.layers import Embedding, Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, SpatialDropout1D  # Layers
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau  # Callbacks
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.utils import to_categorical
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, Conv1D, GlobalMaxPooling1D, Dense, Dropout, BatchNormalization, SpatialDropout1D
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
-# Utility
-import warnings  # Warning control
-warnings.filterwarnings('ignore')  # Ignore warnings
-from collections import Counter  # Count occurrences of elements
+
+import warnings
+warnings.filterwarnings('ignore')
+from collections import Counter
 
 ## About the dataset
 
-# Load dataset
 df.info()
 
 df.describe()
@@ -139,9 +134,7 @@ df_5 = df[df['label'] == 5]
 # Saving the amount of data in label 5
 n_samples_label_5 = round(len(df_5) / 2)
 
-# Downsample the majority classes to n_samples_label_5 samples
-# The random_state variable act like a seed.
-# Setting random_state=42 helps in making your code reproducible and ensures that the results are consistent across different runs.
+# downsample the majority classes to n_samples_label_5 samples
 df_0_downsampled = resample(df_0, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_1_downsampled = resample(df_1, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_2_downsampled = resample(df_2, replace=False, n_samples=n_samples_label_5, random_state=42)
@@ -149,10 +142,8 @@ df_3_downsampled = resample(df_3, replace=False, n_samples=n_samples_label_5, ra
 df_4_downsampled = resample(df_4, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_5_downsampled = resample(df_5, replace=False, n_samples=n_samples_label_5, random_state=42)
 
-# Combine the downsampled data with the minority class data along the y-axis
 df_downsampled = pd.concat([df_1_downsampled, df_0_downsampled, df_3_downsampled, df_4_downsampled, df_2_downsampled, df_5_downsampled])
 
-# Shuffle the combined dataset
 df_downsampled = df_downsampled.sample(frac=1, random_state=42).reset_index(drop=True)
 
 print(f"Number of data for each class is: {n_samples_label_5}")
@@ -173,9 +164,7 @@ def extract_href_sentence_lengths(df, text_column='text'):
     href_sentence_lengths = []
     http_sentence_lengths = []
     www_sentence_lengths = []
-    # Iterate through each text in the DataFrame
     for text in df[text_column]:
-        # Split text into sentences based on common sentence delimiters
         sentences = text.split(' ')
         for sentence in sentences:
             if sentence.lower().startswith('href'):
@@ -224,7 +213,7 @@ def plot_word_clouds(df, df_name='DataFrame', text_column='text', label_column='
         text = ' '.join(df[df[label_column] == label][text_column])
         plot_word_cloud(text, label)
 
-# Function to plot the most common words for each class
+# function to plot the most common words for each class
 def plot_top_n_words(df, df_name='DataFrame', text_column='text', label_column='label', n=10):
     """
     Plots the top N most common words for each class.
@@ -253,7 +242,7 @@ def plot_top_n_words(df, df_name='DataFrame', text_column='text', label_column='
         text = df[df[label_column] == label][text_column]
         plot_words(text, label, n)
 
-# Function to plot the most common bigrams and trigrams for each class
+# function to plot the most common bigrams and trigrams for each class
 def plot_ngrams(df, df_name='DataFrame', text_column='text', label_column='label', ngram_range=(2, 2), n=10):
     """
     Plots the most common n-grams (bigrams or trigrams) for each class.
@@ -284,7 +273,7 @@ def plot_ngrams(df, df_name='DataFrame', text_column='text', label_column='label
         text = df[df[label_column] == label][text_column]
         plot_ngrams_for_label(text, label, ngram_range, n)
 
-# Function to plot the sentiment polarity distribution by class
+# function to plot the sentiment polarity distribution by class
 def plot_sentiment_distribution(df, df_name='DataFrame', text_column='text', label_column='label'):
     """
     Plots the distribution of sentiment polarity scores by class.
@@ -302,9 +291,9 @@ def plot_sentiment_distribution(df, df_name='DataFrame', text_column='text', lab
     plt.ylabel('Sentiment Polarity')
     plt.show()
 
-# Extract lengths of sentences starting with 'href' and 'http' and 'www'
+# extract lengths of sentences starting with 'href' and 'http' and 'www'
 href_sentence_lengths, http_sentence_lengths, www_sentence_lengths = extract_href_sentence_lengths(df)
-# plotting the distribution of each array
+
 
 plt.figure(figsize=(12, 6))
 plt.hist(href_sentence_lengths, bins=20, alpha=0.5, label='href')
@@ -328,20 +317,16 @@ plot_text_length_distribution(df_downsampled, df_name='df_downsmapled')
 from wordcloud import WordCloud
 
 plot_word_clouds(df=df_downsampled, df_name='df_downsmapled')
-# plot_word_clouds(df=original_df, df_name='original_df')
 
 from sklearn.feature_extraction.text import CountVectorizer
 
 plot_top_n_words(df=df_downsampled, df_name='df_downsmapled')
-# plot_top_n_words(df=original_df,  df_name='original_df')
 
 plot_ngrams(df=df_downsampled,  df_name='df_downsmapled', ngram_range=(3, 3))  # For trigrams
-# plot_ngrams(df=original_df,  df_name='original_df', ngram_range=(3, 3))  # For trigrams
 
 from textblob import TextBlob
 
-plot_sentiment_distribution(df_downsampled) # Should discuss if it's important or not
-# plot_sentiment_distribution(original_df) # Should discuss if it's important or not
+plot_sentiment_distribution(df_downsampled)
 
 fig, axes = plt.subplots(1,2, figsize = (20,5))
 sns.distplot(df_downsampled['text_length'], hist=True, kde=True,
@@ -363,7 +348,6 @@ In the next few codes (functions), we will apply several techniques such as: Tok
 This applied to make the dataset simpler by splitting the words from each other, removing unneccessary words (that don't contribute to the whole sentence), stemming to convert the words to their base form, vectorization
 """
 
-## tokenization refers to breaking down a sentence into individual words.
 def tokenize_text(df, text_column='text'):
     """
     Tokenizes the text data.
@@ -477,7 +461,6 @@ nltk.download('punkt_tab')
 nltk.download('stopwords')
 
 df_downsampled_preprocessed = preprocess_text_data(df_downsampled, glove_model)
-# df_preprocessed = preprocess_text_data(original_df)
 print(df_downsampled_preprocessed.head())
 
 df_downsampled_preprocessed.head()
@@ -510,14 +493,12 @@ def split_data(df, test_size=0.2, random_state=42):
   sentiment = df['sentiment'].values.reshape(-1, 1)
   X_embeddings = np.vstack(df['text_embedding'].values)
 
-  # Concatenate features
-  # X = np.hstack((text_length, sentiment, X_embeddings))
   X = np.hstack((sentiment, X_embeddings))
 
   # Extract target
   y = df['label'].values
 
-  # Split to train and test sets
+  # split to train and test
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
   return X_train, X_test, y_train, y_test
@@ -526,8 +507,6 @@ def split_data(df, test_size=0.2, random_state=42):
 X_train_downsampled, X_test_downsampled, y_train_downsampled, y_test_downsampled = split_data(df_downsampled_preprocessed)
 print(f"Train set length for df_downsampled dataset is {X_train_downsampled.shape[0]}")
 print(f"Test set length for df_downsampled dataset is {X_test_downsampled.shape[0]}")
-# print(f"Train set length for original_df dataset is {X_train_original.shape[0]}")
-# print(f"Test set length for original_df dataset is {X_test_original.shape[0]}")
 
 """# Training and tuning models"""
 
@@ -559,7 +538,7 @@ def tune_hyperparameters(model_class, param_distributions, X, y, n_trials=20):
 
     return study.best_params, study.best_value
 
-# Define hyperparameter space for KNeighborsClassifier
+# define hyperparameter for KNeighborsClassifier
 param_distributions_knn = {
     'n_neighbors': optuna.distributions.IntDistribution(1, 50),
     'weights': optuna.distributions.CategoricalDistribution(['uniform', 'distance']),
@@ -571,10 +550,9 @@ best_params_knn, best_score_knn = tune_hyperparameters(KNeighborsClassifier, par
 print('Best hyperparameters for KNN: ', best_params_knn)
 print('Best cross-validation score for KNN: ', best_score_knn)
 
-# Use a subset of the data for faster hyperparameter tuning
 X_small, _, y_small, _ = train_test_split(X_train_downsampled, y_train_downsampled, train_size=0.1, stratify=y_train_downsampled, random_state=42)
 
-# Define hyperparameter space for RandomForestClassifier
+# define hyperparameter space for RandomForestClassifier
 param_distributions_rf = {
     'n_estimators': optuna.distributions.IntDistribution(30, 300, 10),
     'max_features': optuna.distributions.CategoricalDistribution(['sqrt', 'log2']),
@@ -588,7 +566,7 @@ best_params_rf, best_score_rf = tune_hyperparameters(RandomForestClassifier, par
 print('Best hyperparameters for Random Forest: ', best_params_rf)
 print('Best cross-validation score for Random Forest: ', best_score_rf)
 
-# Define hyperparameter space for LinearSVC
+# define hyperparameter for LinearSVC
 param_distributions_linear_svc = {
     'C': optuna.distributions.LogUniformDistribution(0.1, 10)
 }
@@ -599,7 +577,7 @@ print('Best hyperparameters for LinearSVC: ', best_params_linear_svc)
 print('Best cross-validation score for LinearSVC: ', best_score_linear_svc)
 
 import optuna, time
-# Define hyperparameter space for AdaBoost
+# define hyperparameter for AdaBoost
 param_distributions_ada = {
     'n_estimators': optuna.distributions.IntDistribution(50, 200),
     'learning_rate': optuna.distributions.LogUniformDistribution(1e-1, 1.0)
@@ -610,7 +588,7 @@ best_params_ada, best_score_ada = tune_hyperparameters(AdaBoostClassifier, param
 print('Best hyperparameters for AdaBoost: ', best_params_ada)
 print('Best cross-validation score for AdaBoost: ', best_score_ada)
 
-# Define hyperparameter space for XGBoost
+# define hyperparameter for XGBoost
 param_distributions_xgb = {
     'n_estimators': optuna.distributions.IntDistribution(50, 200),
     'max_depth': optuna.distributions.IntDistribution(3, 10),
@@ -697,23 +675,22 @@ for classifier in classifiers:
 
 """# Implement CNN using self embedding"""
 
-# Parameters
 vocab_size = 10000
 embedding_dim = 100
 max_length = 100
 trunc_type = 'post'
 padding_type = 'post'
 
-# Tokenize and pad sequences
+# tokenize and pad
 tokenizer = Tokenizer(num_words=vocab_size, oov_token='')
 tokenizer.fit_on_texts(df_downsampled['text'])
 sequences = tokenizer.texts_to_sequences(df_downsampled['text'])
 padded_sequences = pad_sequences(sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
 
-# Split data
+# split data
 X_train, X_test, y_train, y_test = train_test_split(padded_sequences, df_downsampled['label'], test_size=0.2, random_state=42)
 
-# Build the CNN model
+
 model = Sequential([
     Embedding(vocab_size, embedding_dim, input_length=max_length),
     Conv1D(128, 5, activation='relu'),
@@ -722,19 +699,17 @@ model = Sequential([
     Dense(6, activation='softmax')
 ])
 
-# Compile the model
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-# Train the model
+# train the model
 history = model.fit(X_train, y_train, epochs=20, validation_data=(X_test, y_test), verbose=2)
 
-# Evaluate the model
+# evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
 print(f'Test Accuracy: {test_acc}')
 
 """# Comparing with existing methods (people in kaggle that also tried this dataset)"""
 
-# Mapping emotions to sentiment labels
 emotion_to_sentiment_3labels = {
     0: 0,  # sadness -> negative sentiment
     1: 1,  # joy/love -> neutral sentiment
@@ -745,10 +720,8 @@ emotion_to_sentiment_3labels = {
 }
 
 df_compare = df_downsampled_preprocessed.copy()
-# Map the labels in the DataFrame
 df_compare['label'] = df_compare['label'].map(emotion_to_sentiment_3labels)
 
-# Display the updated DataFrame
 df_compare.head()
 
 X_train_comapre, X_test_compare, y_train_compare, y_test_compare = split_data(df_compare)
@@ -783,7 +756,7 @@ def preprocess(text):
         preprocessed_txt = preprocessed_txt[:-1]
     return preprocessed_txt
 
-# Now we will apply undersampling to the majority class to match class 5
+# now we will apply undersampling to the majority class to match class 5
 
 # Separate the dataset by class
 df_0 = original_df[original_df['label'] == 0]
@@ -793,12 +766,9 @@ df_3 = original_df[original_df['label'] == 3]
 df_4 = original_df[original_df['label'] == 4]
 df_5 = original_df[original_df['label'] == 5]
 
-# Saving the amount of data in label 5
+# saving the amount of data in label 5
 n_samples_label_5 = round(len(df_5) / 2)
 
-# Downsample the majority classes to n_samples_label_5 samples
-# The random_state variable act like a seed.
-# Setting random_state=42 helps in making your code reproducible and ensures that the results are consistent across different runs.
 df_0_downsampled = resample(df_0, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_1_downsampled = resample(df_1, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_2_downsampled = resample(df_2, replace=False, n_samples=n_samples_label_5, random_state=42)
@@ -806,10 +776,8 @@ df_3_downsampled = resample(df_3, replace=False, n_samples=n_samples_label_5, ra
 df_4_downsampled = resample(df_4, replace=False, n_samples=n_samples_label_5, random_state=42)
 df_5_downsampled = resample(df_5, replace=False, n_samples=n_samples_label_5, random_state=42)
 
-# Combine the downsampled data with the minority class data along the y-axis
 df_downsampled_second = pd.concat([df_1_downsampled, df_0_downsampled, df_3_downsampled, df_4_downsampled, df_2_downsampled, df_5_downsampled])
 
-# Shuffle the combined dataset
 df_downsampled_second = df_downsampled_second.sample(frac=1, random_state=42).reset_index(drop=True)
 
 print(f"Number of data for each class is: {n_samples_label_5}")
